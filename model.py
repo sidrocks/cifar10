@@ -60,14 +60,14 @@ class Net(nn.Module):
 
             ## Depthwise Seperable Convolution1
             nn.Conv2d(32,32, 3,  padding=1,groups=32 ,bias = False),  # Input: 16x16x32 | Output: 16x16x32 | RF: 13x13
-            nn.Conv2d(32, 64, 1, padding=0, bias = False),   # Input: 16x16x32 | Output: 18x18x64 | RF: 13x13
+            nn.Conv2d(32, 64, 1, padding=0, bias = False),   # Input: 16x16x32 | Output: 16x16x64 | RF: 13x13
             nn.BatchNorm2d(64),
             nn.ReLU(),            
             nn.Dropout2d(self.drop_prob),
         )
         self.sc2 = nn.Sequential(
 
-            nn.Conv2d(64, 32, 1, stride=2), # Input: 18x18x32 | Output: 9x9x64 | RF: 13x13
+            nn.Conv2d(64, 32, 1, stride=2), # Input: 16x16x64 | Output: 8x8x32 | RF: 13x13
             nn.ReLU()
         )
         
@@ -75,12 +75,12 @@ class Net(nn.Module):
         # Convolution Block 3: single dilated convolution to ensure RF > 44
         # 32x32x64 -> 32x32x96
         self.conv_block3 = nn.Sequential(
-            nn.Conv2d(32, 64, 3,  padding=1, bias = False,dilation=2), # Input: 9x9x64 | Output: 7x7x64 | RF: 29x29
+            nn.Conv2d(32, 64, 3,  padding=1, bias = False,dilation=2), # Input: 8x8x32 | Output: 8x8x64 | RF: 29x29
             nn.BatchNorm2d(64),
             nn.ReLU(),            
             nn.Dropout2d(self.drop_prob),
 
-            nn.Conv2d(64, 64, 3,  padding=1, bias = False),  # Input: 7x7x64| Output: 7x7x64 | RF: 45x45
+            nn.Conv2d(64, 64, 3,  padding=1, bias = False),  # Input: 8x8x64| Output: 8x8x64 | RF: 37x37
             nn.BatchNorm2d(64),
             nn.ReLU(),            
             nn.Dropout2d(self.drop_prob),
@@ -88,21 +88,21 @@ class Net(nn.Module):
             
         )
         self.sc3 = nn.Sequential(
-            nn.Conv2d(64, 16, 1, stride=2), # Input: 7x7x64| Output: 4x4x16 | RF: 61x61
+            nn.Conv2d(64, 16, 1, stride=2), # Input: 8x8x64| Output: 4x4x16 | RF: 37x37
             nn.ReLU()
         )        
 
         # Convolution Block 4: bottleneck with stride=2 in the 3x3 (reduces params)
         # 32x32x96 -> 16x16x128
         self.conv_block4 = nn.Sequential(
-            nn.Conv2d(16, 32, 3, padding=1, bias = False), # Input: 4x4x16 | Output: 4x4x32 | RF: 93x93
+            nn.Conv2d(16, 32, 3, padding=1, bias = False), # Input: 4x4x16 | Output: 4x4x32 | RF: 53x53
             nn.BatchNorm2d(32),
             nn.ReLU(),            
             nn.Dropout2d(self.drop_prob),
 
             ## Depthwise seperable Convolution2
-            nn.Conv2d(32,32, 3,  padding=1,groups=32 ,bias = False),# Input: 4x4x16 | Output: 4x4x32 | RF: 125x125
-            nn.Conv2d(32, 10, 1, padding=0, bias = False),          # Input: 4x4x32| Output: 6x6x10 | RF: 125x125
+            nn.Conv2d(32,32, 3,  padding=1,groups=32 ,bias = False),# Input: 4x4x32 | Output: 4x4x32 | RF: 69x69
+            nn.Conv2d(32, 10, 1, padding=0, bias = False),          # Input: 4x4x32| Output: 4x4x10 | RF: 69x69
             # nn.ReLU(),
             # nn.BatchNorm2d(10),
         )        
