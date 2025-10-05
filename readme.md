@@ -126,24 +126,23 @@ A well-structured network, and receptive field (RF) expansion is clearly intenti
 
    ***Receptive Field***
    
-   | Layer / Block      | Kernel | Stride | Dilation | jump | RF after layer |
-   | ------------------ | ------ | ------ | -------- | ---- | -------------- |
-   | Input              | -      | -      | -        | 1    | 1              |
-   | Conv3×3            | 3      | 1      | 1        | 1    | 3              |
-   | Conv3×3            | 3      | 1      | 1        | 1    | 5              |
-   | SC1 1×1 s=2        | 1      | 2      | 1        | 2    | 5              |
-   | Conv3×3            | 3      | 1      | 1        | 2    | 9              |
-   | Depthwise3×3       | 3      | 1      | 1        | 2    | 13             |
-   | Pointwise1×1       | 1      | 1      | 1        | 2    | 13             |
-   | SC2 1×1 s=2        | 1      | 2      | 1        | 4    | 13             |
-   | DilatedConv3×3 d=2 | 5eff   | 1      | 2        | 4    | 29             |
-   | Conv3×3            | 3      | 1      | 1        | 4    | 37             |
-   | SC3 1×1 s=2        | 1      | 2      | 1        | 8    | 37             |
-   | Conv3×3            | 3      | 1      | 1        | 8    | 53             |
-   | Depthwise3×3       | 3      | 1      | 1        | 8    | 69             |
-   | Pointwise1×1       | 1      | 1      | 1        | 8    | 69             |
-   | GAP                | -      | -      | -        | -    | ≈Full image    |
-   
+      | #  | Layer (Name)   | Type              | In Ch | Out Ch | Kernel / Stride / Dilation | Feature Map (HxW) | Jump | RF (after layer) |
+      | -- | -------------- | ----------------- | ----- | ------ | -------------------------- | ----------------- | ---- | ---------------- |
+      | 0  | Input          | —                 | 3     | 3      | —                          | 32×32             | 1    | 1                |
+      | 1  | conv_block1[0] | Conv3×3           | 3     | 32     | 3 / 1 / 1                  | 32×32             | 1    | 3                |
+      | 2  | conv_block1[4] | Conv3×3           | 32    | 64     | 3 / 1 / 1                  | 32×32             | 1    | 5                |
+      | 3  | sc1[0]         | 1×1 stride=2      | 64    | 32     | 1 / 2 / 1                  | 16×16             | 2    | 5                |
+      | 4  | conv_block2[0] | Conv3×3           | 32    | 32     | 3 / 1 / 1                  | 16×16             | 2    | 9                |
+      | 5  | conv_block2[4] | Depthwise 3×3     | 32    | 32     | 3 / 1 / 1                  | 16×16             | 2    | 13               |
+      | 6  | conv_block2[5] | Pointwise 1×1     | 32    | 64     | 1 / 1 / 1                  | 16×16             | 2    | 13               |
+      | 7  | sc2[0]         | 1×1 stride=2      | 64    | 32     | 1 / 2 / 1                  | 8×8               | 4    | 13               |
+      | 8  | conv_block3[0] | Conv3×3 dilated=2 | 32    | 64     | 3 / 1 / 2                  | 8×8               | 4    | 29               |
+      | 9  | conv_block3[4] | Conv3×3           | 64    | 64     | 3 / 1 / 1                  | 8×8               | 4    | 37               |
+      | 10 | sc3[0]         | 1×1 stride=2      | 64    | 16     | 1 / 2 / 1                  | 4×4               | 8    | 37               |
+      | 11 | conv_block4[0] | Conv3×3           | 16    | 32     | 3 / 1 / 1                  | 4×4               | 8    | 53               |
+      | 12 | conv_block4[4] | Depthwise 3×3     | 32    | 32     | 3 / 1 / 1                  | 4×4               | 8    | 69               |
+      | 13 | conv_block4[5] | Pointwise 1×1     | 32    | 10     | 1 / 1 / 1                  | 4×4               | 8    | 69               |
+      | 14 | GAP            | AdaptiveAvgPool   | 10    | 10     | —                          | 1×1               | —    | 69               |
    GAP
    
    Global average pooling doesn't expand RF, just aggregates entire spatial map. So effective RF covers the entire input, but theoretical RF at this point is 69×69, which is already > input size (32×32). So effectively, it's full coverage.
@@ -815,3 +814,4 @@ Dropout after most conv blocks (~0.01) + BN after each conv keeps model generali
 
 
 **For questions or improvements, feel free to open an issue or pull request.**
+
