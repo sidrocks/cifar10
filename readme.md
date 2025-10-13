@@ -1,4 +1,4 @@
-# CIFAR-10 DNN Modular Training Pipeline
+# CIFAR-10 DNN Modular Training Pipeline.
 
 This repository provides a modular deep learning pipeline for training and evaluating models on the CIFAR-10 dataset using PyTorch and Albumentations. The code is organized for clarity, extensibility, and ease of experimentation.
 
@@ -814,4 +814,5 @@ Dropout after most conv blocks (~0.01) + BN after each conv keeps model generali
 
 
 **For questions or improvements, feel free to open an issue or pull request.**
+
 
